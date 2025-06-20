@@ -1,21 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import DesignerCanvas from "@/components/DesignerCanvas"
 import GarmentSelector from "@/components/GarmentSelector"
 import ColorPicker from "@/components/ColorPicker"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export default function DesignerPage() {
   const [canvasData, setCanvasData] = useState(null)
-  const router = useRouter()
-
-  const handleContinue = () => {
-    if (!canvasData) return alert("Please create a design first!")
-
-    const encoded = encodeURIComponent(JSON.stringify(canvasData))
-    router.push(`/order?design=${encoded}`)
-  }
 
   return (
     <div className="p-4 space-y-6">
@@ -28,15 +19,6 @@ export default function DesignerPage() {
         </div>
 
         <DesignerCanvas onChange={setCanvasData} />
-      </div>
-
-      <div className="text-right">
-        <button
-          className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
-          onClick={handleContinue}
-        >
-          Continue to Order
-        </button>
       </div>
     </div>
   )

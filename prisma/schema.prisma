@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Garment {
+  id         Int            @id @default(autoincrement())
+  name       String
+  category   String
+  basePrice  Float
+  imageUrl   String? // Optional image for garment display
+  colors     GarmentColor[]
+  orderItems OrderItem[]    @relation("GarmentOrderItems")
+}
+
+model GarmentColor {
+  id        Int     @id @default(autoincrement())
+  garment   Garment @relation(fields: [garmentId], references: [id])
+  garmentId Int
+  name      String
+  hexCode   String
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  customer   String
+  email      String
+  totalQuote Float
+  status     String      @default("pending")
+  createdAt  DateTime    @default(now())
+  items      OrderItem[]
+  design     Design?     @relation(fields: [designId], references: [id])
+  designId   String?     @unique
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  garment   Garment @relation("GarmentOrderItems", fields: [garmentId], references: [id])
+  garmentId Int
+  color     String
+  size      String
+  quantity  Int
+  priceEach Float
+}
+
+model Design {
+  id         String @id @default(uuid())
+  canvasJson Json
+  previewUrl String
+  order      Order?
+}
