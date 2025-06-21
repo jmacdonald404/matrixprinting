@@ -40,18 +40,23 @@ export default function DesignerPage() {
 
   const handleAddText = () => {
     if (textInput.trim()) {
-      canvasRef.current?.addText(textInput.trim())
-      setTextInput("")
+      if (canvasRef.current) {
+        canvasRef.current.addText(textInput.trim())
+        setTextInput("")
+      } else {
+        console.error("Canvas reference not available")
+      }
     }
   }
 
   return (
     <div className="p-4 space-y-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold">Design Your Garment</h1>
-
-      <div className="flex gap-8">
-        {/* Controls */}
-        <div className="space-y-6 w-48">
+      
+      <div className="flex flex-col gap-4"> {/* Change to flex-col to stack elements */}
+        <div className="flex gap-8">
+          {/* Controls */}
+          <div className="space-y-6 w-48">
           <div>
             <label className="block font-semibold mb-1">Choose Garment</label>
             <select
@@ -70,7 +75,7 @@ export default function DesignerPage() {
               ))}
             </select>
           </div>
-
+          
           <div>
             <label className="block font-semibold mb-1">Garment Color</label>
             <input
@@ -81,26 +86,26 @@ export default function DesignerPage() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-         <input
-           type="text"
-          value={textInput}
-          onChange={(e) => setTextInput(e.target.value)}
-          placeholder="Enter text"
-          className="border p-2 rounded"
-        />
-         <button
-           onClick={handleAddText}
-           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-         >
-           Add Text
-         </button>
-         <input type="file" accept="image/*" onChange={handleImageUpload} />
-       </div>
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Enter text"
+              className="border p-2 rounded"
+            />
+            <button
+              onClick={handleAddText}
+              className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+            >
+              Add Text
+            </button>
+            <input type="file" accept="image/*" onChange={handleImageUpload} />
+          </div>
+        </div>
 
-        {/* Preview & Canvas */}
-        <div
-          className="relative border rounded-md"
+        {/* Canvas container */}
+        <div className="relative border rounded-md mx-auto" /* Add mx-auto to center */
           style={{
             width: 500,
             height: 600,
@@ -109,6 +114,7 @@ export default function DesignerPage() {
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
+            position: "relative",
           }}
         >
           <DesignerCanvas 
@@ -116,14 +122,16 @@ export default function DesignerPage() {
             onChange={(data) => setCanvasData(data)} 
           />
         </div>
+
+        {/* Continue button */}
         <div className="text-right">
-         <button
-           className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
-           onClick={handleContinue}
-         >
-           Continue to Order
-         </button>
-       </div>
+          <button
+            className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
+            onClick={handleContinue}
+          >
+            Continue to Order
+          </button>
+        </div>
       </div>
     </div>
   )

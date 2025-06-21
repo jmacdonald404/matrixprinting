@@ -18,22 +18,44 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
     const canvasRef = useRef<any>(null)
     const canvasElRef = useRef<HTMLCanvasElement>(null)
     const [fabricModule, setFabricModule] = useState<any>(null)
+    const [isLoading, setIsLoading] = useState(true);
 
     // Load fabric dynamically
     useEffect(() => {
       import("fabric").then((mod) => {
-        const fabric = mod.fabric ?? mod;
+        console.log('Fabric module:', mod); // Debug log
+        
+        // Try different ways to get fabric
+        let fabric: any;
+        if (mod.default) {
+          fabric = mod.default;
+        } else if ((mod as any).fabric) {
+          fabric = (mod as any).fabric;
+        } else {
+          fabric = mod;
+        }
+        
+        console.log('Fabric object:', fabric); // Debug log
+        
+        if (!fabric || !fabric.Canvas) {
+          console.error('Fabric Canvas not found in module:', fabric);
+          return;
+        }
+        
         setFabricModule(fabric);
-    
+        setIsLoading(false); // Add loading state
+
+        if (!canvasElRef.current) return;
+        
         const canvas = new fabric.Canvas(canvasElRef.current, {
-          width: 500, // Add a default width
-          height: 600, // Add a default height
-          backgroundColor: '#ffffff' // Add a background color to make the canvas visible
+          width: 500,
+          height: 600,
+          backgroundColor: 'transparent'
         });
         canvasRef.current = canvas;
     
         // Handle object movement
-        canvas.on('object:moving', (e) => {
+        canvas.on('object:moving', (e: any) => {
           const obj = e.target;
           // Keep objects within canvas bounds
           if (obj) {
@@ -46,13 +68,13 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
         });
     
         // Update cursor on hover
-        canvas.on('mouse:over', (e) => {
+        canvas.on('mouse:over', (e: any) => {
           if (e.target) {
             canvas.defaultCursor = 'move';
           }
         });
     
-        canvas.on('mouse:out', (e) => {
+        canvas.on('mouse:out', (e: any) => {
           canvas.defaultCursor = 'default';
         });
     
@@ -72,25 +94,59 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
     // Expose API to parent
     useImperativeHandle(ref, () => ({
       addText: (text: string) => {
-        if (!fabricModule || !canvasRef.current) return;
+        console.log('addText called with:', text);
+        console.log('fabricModule:', fabricModule);
+        console.log('canvasRef.current:', canvasRef.current);
+        console.log('isLoading:', isLoading);
+        
+        if (isLoading) {
+          console.error('Canvas is still loading');
+          return;
+        }
+        
+        if (!fabricModule || !canvasRef.current) {
+          console.error('Missing fabricModule or canvasRef.current');
+          return;
+        }
+        
         const canvas = canvasRef.current;
-        const textbox = new fabricModule.Textbox(text, {
-          left: canvas.width / 2, // Center horizontally
-          top: canvas.height / 2, // Center vertically
-          fontSize: 24,
-          fill: "#000000",
-          editable: true,
-          centeredScaling: true,
-          originX: 'center',
-          originY: 'center',
-          padding: 5,
-          borderColor: '#000000',
-          cornerColor: '#000000',
-          cornerSize: 8,
-        });
-        canvas.add(textbox);
-        canvas.setActiveObject(textbox); // Select the text immediately
-        canvas.renderAll();
+        console.log('Canvas object:', canvas);
+        console.log('Canvas width/height:', canvas.width, canvas.height);
+        
+        try {
+          const textbox = new fabricModule.Textbox(text, {
+            left: canvas.width / 2, // Center horizontally
+            top: canvas.height / 2, // Center vertically
+            fontSize: 48, // Increased font size
+            fill: "#ff0000", // Changed to bright red for testing
+            editable: true,
+            centeredScaling: true,
+            originX: 'center',
+            originY: 'center',
+            padding: 10,
+            borderColor: '#ff0000',
+            cornerColor: '#ff0000',
+            cornerSize: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)', // White background
+          });
+          
+          console.log('Textbox created:', textbox);
+          canvas.add(textbox);
+          canvas.bringToFront(textbox); // This works even though it shows an error
+          canvas.setActiveObject(textbox); // Select the text immediately
+          canvas.renderAll();
+          console.log('Text object added to canvas successfully');
+          console.log('Canvas objects:', canvas.getObjects());
+          console.log('Canvas objects length:', canvas.getObjects().length);
+          console.log('Canvas viewport:', canvas.viewportTransform);
+          console.log('Canvas dimensions:', canvas.width, canvas.height);
+          
+          // Force a complete re-render
+          canvas.requestRenderAll();
+          canvas.renderAll();
+        } catch (error) {
+          console.error('Error creating textbox:', error);
+        }
       },
       
       addImage: (url: string) => {
@@ -123,7 +179,9 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
       <canvas
         ref={canvasElRef}
         className="absolute top-0 left-0 w-full h-full"
-        style={{ touchAction: "none" }}
+        width={500}  // Add explicit width
+        height={600} // Add explicit height
+        style={{ touchAction: "none", zIndex: 10 }}
       />
     )
   }
