@@ -1,43 +1,39 @@
-"use client"
-
-import { useState } from "react"
-import DesignerCanvas from "@/components/DesignerCanvas"
-import GarmentSelector from "@/components/GarmentSelector"
-import ColorPicker from "@/components/ColorPicker"
-import { useRouter } from "next/navigation"
-
-export default function DesignerPage() {
-  const [canvasData, setCanvasData] = useState(null)
-  const router = useRouter()
-
-  const handleContinue = () => {
-    if (!canvasData) return alert("Please create a design first!")
-
-    const encoded = encodeURIComponent(JSON.stringify(canvasData))
-    router.push(`/order?design=${encoded}`)
-  }
-
+export default function HomePage() {
   return (
-    <div className="p-4 space-y-6">
-      <h1 className="text-3xl font-bold">Design Your Garment</h1>
+    <main className="p-6 max-w-5xl mx-auto space-y-10">
+      <section className="text-center space-y-4">
+        <h1 className="text-4xl font-bold">Welcome to PrintLab</h1>
+        <p className="text-lg text-gray-600">
+          Custom screen printing, DTG, DTF, and embroidery — made easy.
+        </p>
+        <a
+          href="/designer"
+          className="inline-block bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition"
+        >
+          Start Designing
+        </a>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <GarmentSelector />
-          <ColorPicker />
+      <section className="grid md:grid-cols-2 gap-6">
+        <div className="p-4 border rounded shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">Our Services</h2>
+          <ul className="list-disc list-inside text-gray-700 space-y-1">
+            <li>Screen Printing</li>
+            <li>Direct-to-Garment (DTG)</li>
+            <li>Direct-to-Film (DTF)</li>
+            <li>Embroidery</li>
+          </ul>
         </div>
 
-        <DesignerCanvas onChange={setCanvasData} />
-      </div>
-
-      <div className="text-right">
-        <button
-          className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
-          onClick={handleContinue}
-        >
-          Continue to Order
-        </button>
-      </div>
-    </div>
+        <div className="p-4 border rounded shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">Why Choose Us?</h2>
+          <ul className="list-disc list-inside text-gray-700 space-y-1">
+            <li>High-quality prints on all garments</li>
+            <li>No minimums — order 1 or 1000</li>
+            <li>Fast turnaround and great support</li>
+          </ul>
+        </div>
+      </section>
+    </main>
   )
 }
