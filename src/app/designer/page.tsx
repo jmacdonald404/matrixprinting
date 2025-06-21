@@ -111,7 +111,10 @@ export default function DesignerPage() {
             backgroundPosition: "center",
           }}
         >
-          <DesignerCanvas ref={canvasRef} onChange={() => {}} />
+          <DesignerCanvas 
+            ref={canvasRef} 
+            onChange={(data) => setCanvasData(data)} 
+          />
         </div>
         <div className="text-right">
          <button

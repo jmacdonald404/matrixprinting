@@ -26,7 +26,9 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
         setFabricModule(fabric);
     
         const canvas = new fabric.Canvas(canvasElRef.current, {
-          // ... existing options ...
+          width: 500, // Add a default width
+          height: 600, // Add a default height
+          backgroundColor: '#ffffff' // Add a background color to make the canvas visible
         });
         canvasRef.current = canvas;
     
@@ -54,7 +56,9 @@ const DesignerCanvas = forwardRef<DesignerCanvasHandle, { onChange: (json: any) 
           canvas.defaultCursor = 'default';
         });
     
-        // ... rest of your existing code ...
+        canvas.on('object:modified', () => {
+          onChange(canvas.toJSON());
+        });
       });
     
       return () => {
