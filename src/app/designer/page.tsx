@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { useRouter } from "next/navigation"
 // import DesignerCanvas from "@/components/DesignerCanvas"
 import DesignerCanvas, { DesignerCanvasHandle } from "@/components/DesignerCanvas"
 
@@ -16,6 +17,14 @@ export default function DesignerPage() {
   const [canvasData, setCanvasData] = useState(null)
   const [textInput, setTextInput] = useState("")
   const canvasRef = useRef<DesignerCanvasHandle>(null)
+  const router = useRouter()
+
+  const handleContinue = () => {
+    if (!canvasData) return alert("Please create a design first!")
+
+    const encoded = encodeURIComponent(JSON.stringify(canvasData))
+    router.push(`/order?design=${encoded}`)
+  }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -104,51 +113,15 @@ export default function DesignerPage() {
         >
           <DesignerCanvas ref={canvasRef} onChange={() => {}} />
         </div>
+        <div className="text-right">
+         <button
+           className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
+           onClick={handleContinue}
+         >
+           Continue to Order
+         </button>
+       </div>
       </div>
     </div>
   )
 }
-// "use client"
-
-// import { useState } from "react"
-// import DesignerCanvas from "@/components/DesignerCanvas"
-// import GarmentSelector from "@/components/GarmentSelector"
-// import ColorPicker from "@/components/ColorPicker"
-// import { useRouter } from "next/navigation"
-
-// export default function DesignerPage() {
-//   const [canvasData, setCanvasData] = useState(null)
-//   const router = useRouter()
-
-//   const handleContinue = () => {
-//     if (!canvasData) return alert("Please create a design first!")
-
-//     const encoded = encodeURIComponent(JSON.stringify(canvasData))
-//     router.push(`/order?design=${encoded}`)
-//   }
-
-//   return (
-//     <div className="p-4 space-y-6">
-//       <h1 className="text-3xl font-bold">Design Your Garment</h1>
-
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//         <div className="space-y-4">
-//           <GarmentSelector />
-//           <ColorPicker />
-//         </div>
-
-//         <DesignerCanvas onChange={setCanvasData} />
-//       </div>
-
-//       <div className="text-right">
-//         <button
-//           className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
-//           onClick={handleContinue}
-//         >
-//           Continue to Order
-//         </button>
-//       </div>
-//     </div>
-//   )
-// }
-
